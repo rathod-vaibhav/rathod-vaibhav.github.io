@@ -3014,11 +3014,56 @@
     if (hs) statsObs.observe(hs);
 
     /* ── Form ── */
-    function handleSend() {
+    async function handleSend() {
       const btn = document.querySelector('.btn-send');
+      const nameInput = document.querySelector('.contact-form-card input[placeholder="John Doe"]');
+      const emailInput = document.querySelector('.contact-form-card input[type="email"]');
+      const subjectInput = document.querySelector('.contact-form-card input[placeholder="Project Discussion"]');
+      const messageInput = document.querySelector('.contact-form-card textarea');
+
+      const data = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: subjectInput.value.trim(),
+        message: messageInput.value.trim()
+      };
+
+      if (!data.name || !data.email || !data.subject || !data.message) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
       btn.textContent = 'Sending…'; btn.disabled = true;
-      setTimeout(() => { btn.textContent = 'Message Sent ✓'; btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)'; }, 1000);
-      setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; btn.style.background = ''; }, 3500);
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          btn.textContent = 'Message Sent ✓';
+          btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+          // Clear form
+          nameInput.value = '';
+          emailInput.value = '';
+          subjectInput.value = '';
+          messageInput.value = '';
+        } else {
+          throw new Error('Failed to send');
+        }
+      } catch (err) {
+        btn.textContent = 'Failed to Send ✕';
+        btn.style.background = 'linear-gradient(135deg,#ef4444,#dc2626)';
+        console.error(err);
+      }
+
+      setTimeout(() => {
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 3500);
     }
 
     /* ── Stagger ── */
