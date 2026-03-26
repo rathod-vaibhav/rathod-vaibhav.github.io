@@ -148,42 +148,42 @@
       opacity: .5
     }
 
-    /* ════════════ THEME TOGGLE ════════════ */
+    /* ════════════ THEME TOGGLE (in nav) ════════════ */
     #theme-toggle {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border2);
+      background: var(--surface2);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      box-shadow: 0 4px 20px var(--shadow);
-      transition: background .4s, border-color .4s, transform .3s, box-shadow .3s;
+      color: var(--muted);
+      box-shadow: none;
+      transition: background .3s, border-color .3s, color .3s, transform .2s;
       flex-shrink: 0;
     }
 
     #theme-toggle:hover {
-      transform: scale(1.12) rotate(18deg);
-      box-shadow: 0 6px 28px var(--glow)
+      background: var(--surface);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.08);
     }
 
-    .icon-dark {
-      display: block
-    }
+    /* Dark mode: show sun SVG (to switch to light) */
+    .icon-dark { display: flex; align-items: center; justify-content: center; }
+    .icon-light { display: none; align-items: center; justify-content: center; }
 
-    .icon-light {
-      display: none
-    }
+    [data-theme="light"] .icon-dark { display: none; }
+    [data-theme="light"] .icon-light { display: flex; }
 
-    [data-theme="light"] .icon-dark {
-      display: none
-    }
-
-    [data-theme="light"] .icon-light {
-      display: block
+    /* Nav right group: theme toggle + hire me button */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
     }
 
     /* ════════════ NAV ════════════ */
@@ -1820,17 +1820,20 @@
         text-align: center
       }
 
-      #theme-toggle {
-        width: 46px;
-        height: 46px;
+      #fab-row {
+        bottom: 1.2rem;
+        right: 1.2rem;
       }
       #chat-toggle {
         width: 46px;
         height: 46px;
       }
-      #fab-row {
-        bottom: 1.2rem;
-        right: 1.2rem;
+      .nav-right {
+        gap: .5rem;
+      }
+      #theme-toggle {
+        width: 34px;
+        height: 34px;
       }
     }
 
@@ -1844,7 +1847,7 @@
    CHATBOT — ENHANCED v2
 ═══════════════════════════════════════ */
 
-    /* FAB row: theme toggle + chat toggle on one horizontal line */
+    /* FAB row: only chat toggle now (theme toggle moved to nav) */
     #fab-row {
       position: fixed;
       bottom: 2rem;
@@ -1853,13 +1856,6 @@
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-
-    /* Move theme toggle into the fab-row */
-    #theme-toggle {
-      position: static !important;
-      bottom: auto !important;
-      right: auto !important;
     }
 
     /* Chat window — draggable, resizable, fixed position */
@@ -2225,14 +2221,8 @@
   <div id="cursor"></div>
   <div id="cursor-ring"></div>
 
-  <!-- FAB ROW: Theme Toggle + Chat Toggle (horizontal) -->
+  <!-- Chat FAB (bottom-right) -->
   <div id="fab-row">
-    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
-      <span class="icon-dark">🌙</span>
-      <span class="icon-light">☀️</span>
-    </button>
-
-    <!-- Chat Toggle FAB -->
     <button id="chat-toggle" onclick="openChat()" title="Chat with Vaibhav AI" aria-label="Open chat">
       <span class="notif-dot"></span>
       <span class="icon-chat">
@@ -2297,7 +2287,32 @@
       <li><a href="#projects" onclick="closeNav()">Projects</a></li>
       <li><a href="#contact" onclick="closeNav()">Contact</a></li>
     </ul>
-    <a href="#contact" class="nav-cta">Hire Me</a>
+    <div class="nav-right">
+      <!-- Theme Toggle with proper SVG icons -->
+      <button id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
+        <!-- Sun icon (shown in dark mode → click to go light) -->
+        <span class="icon-dark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </span>
+        <!-- Moon icon (shown in light mode → click to go dark) -->
+        <span class="icon-light">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+      </button>
+      <a href="#contact" class="nav-cta">Hire Me</a>
+    </div>
     <div class="hamburger" id="hamburger" onclick="toggleNav()">
       <span></span><span></span><span></span>
     </div>
@@ -2337,7 +2352,7 @@
 
       <!-- <div class="hero-photo-wrap">
       <div class="hero-photo-inner" style="width:272px;height:272px;border:4px solid var(--border);box-shadow:0 10px 40px rgba(0,0,0,0.2);">
-        <img src="Vaibhav.png" alt="Vaibhav">
+        <img src="vaibhav.png" alt="Vaibhav">
       </div>
       <div class="photo-badge">
         <span class="green-dot"></span>Open to opportunities
@@ -2407,7 +2422,7 @@
           <div style="position:relative">
             <div class="about-photo-frame">
               <div class="no-photo">
-                <img src="vaibhav.png" alt="Vaibhav Rathod">
+                <img src="Vaibhav.png" alt="Vaibhav Rathod">
               </div>
             </div>
             <div class="about-photo-deco"></div>
@@ -2633,17 +2648,17 @@
           <p>Whether you need a senior Python developer to join your team, build a product from scratch, or optimize an
             existing system — I'd love to hear from you.</p>
           <div class="contact-items">
-            <a href="mailto:vaibhavrathod303@gmail.com" class="contact-item">
+            <a href="/cdn-cgi/l/email-protection#780e19111a10190e0a190c10171c4b484b381f15191114561b1715" class="contact-item">
               <div class="contact-item-icon">✉️</div>
-              <div class="contact-item-text"><label>Email</label><span>vaibhavrathod303@gmail.com</span></div>
+              <div class="contact-item-text"><label>Email</label><span><span class="__cf_email__" data-cfemail="bbcddad2d9d3dacdc9dacfd3d4df888b88fbdcd6dad2d795d8d4d6">[email&#160;protected]</span></span></div>
             </a>
             <a href="tel:+917265806601" class="contact-item">
               <div class="contact-item-icon">📱</div>
               <div class="contact-item-text"><label>Phone</label><span>+91 72658-06601</span></div>
             </a>
-            <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank" class="contact-item">
+            <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank" class="contact-item">
               <div class="contact-item-icon">💼</div>
-              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/in/rathod-vaibhav-b10b17193</span></div>
+              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/vaibhav-rathod</span></div>
             </a>
             <a href="https://github.com/rathod-vaibhav" target="_blank" class="contact-item">
               <div class="contact-item-icon">🐱</div>
@@ -2672,9 +2687,9 @@
       <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>document.write(new Date().getFullYear())</script> <span>Vaibhav Rathod</span>. All Rights Reserved
     </div>
     <div class="footer-links">
-      <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank">LinkedIn</a>
+      <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank">LinkedIn</a>
       <a href="https://github.com/rathod-vaibhav" target="_blank">GitHub</a>
-      <a href="mailto:vaibhavrathod303@gmail.com">Email</a>
+      <a href="/cdn-cgi/l/email-protection#a5d3c4ccc7cdc4d3d7c4d1cdcac1969596e5c2c8c4ccc98bc6cac8">Email</a>
     </div>
   </footer>
 
@@ -2754,56 +2769,11 @@
     if (hs) statsObs.observe(hs);
 
     /* ── Form ── */
-    async function handleSend() {
+    function handleSend() {
       const btn = document.querySelector('.btn-send');
-      const nameInput = document.querySelector('.contact-form-card input[placeholder="John Doe"]');
-      const emailInput = document.querySelector('.contact-form-card input[type="email"]');
-      const subjectInput = document.querySelector('.contact-form-card input[placeholder="Project Discussion"]');
-      const messageInput = document.querySelector('.contact-form-card textarea');
-
-      const data = {
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        subject: subjectInput.value.trim(),
-        message: messageInput.value.trim()
-      };
-
-      if (!data.name || !data.email || !data.subject || !data.message) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
       btn.textContent = 'Sending…'; btn.disabled = true;
-
-      try {
-        const res = await fetch('https://chatbot-model-uyuz.onrender.com/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        if (res.ok) {
-          btn.textContent = 'Message Sent ✓';
-          btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
-          // Clear form
-          nameInput.value = '';
-          emailInput.value = '';
-          subjectInput.value = '';
-          messageInput.value = '';
-        } else {
-          throw new Error('Failed to send');
-        }
-      } catch (err) {
-        btn.textContent = 'Failed to Send ✕';
-        btn.style.background = 'linear-gradient(135deg,#ef4444,#dc2626)';
-        console.error(err);
-      }
-
-      setTimeout(() => {
-        btn.textContent = 'Send Message →';
-        btn.disabled = false;
-        btn.style.background = '';
-      }, 3500);
+      setTimeout(() => { btn.textContent = 'Message Sent ✓'; btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)'; }, 1000);
+      setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; btn.style.background = ''; }, 3500);
     }
 
     /* ── Stagger ── */
@@ -2955,7 +2925,7 @@
       input.value = '';
       showTypingIndicator();
       try {
-        const res = await fetch('https://chatbot-model-uyuz.onrender.com/ask', {
+        const res = await fetch('http://127.0.0.1:8000/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: text })
