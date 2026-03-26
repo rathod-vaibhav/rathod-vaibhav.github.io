@@ -150,10 +150,6 @@
 
     /* ════════════ THEME TOGGLE ════════════ */
     #theme-toggle {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 500;
       width: 52px;
       height: 52px;
       border-radius: 50%;
@@ -165,7 +161,8 @@
       justify-content: center;
       font-size: 1.3rem;
       box-shadow: 0 4px 20px var(--shadow);
-      transition: background .4s, border-color .4s, transform .3s, box-shadow .3s
+      transition: background .4s, border-color .4s, transform .3s, box-shadow .3s;
+      flex-shrink: 0;
     }
 
     #theme-toggle:hover {
@@ -1824,10 +1821,16 @@
       }
 
       #theme-toggle {
+        width: 46px;
+        height: 46px;
+      }
+      #chat-toggle {
+        width: 46px;
+        height: 46px;
+      }
+      #fab-row {
         bottom: 1.2rem;
         right: 1.2rem;
-        width: 46px;
-        height: 46px
       }
     }
 
@@ -1838,28 +1841,37 @@
     }
 
     /* ═══════════════════════════════════════
-   CHATBOT — FULLY FIXED
+   CHATBOT — ENHANCED v2
 ═══════════════════════════════════════ */
 
-    /* Wrapper: sits fixed bottom-right, stacks window above toggle */
-    #chatbot {
+    /* FAB row: theme toggle + chat toggle on one horizontal line */
+    #fab-row {
       position: fixed;
-      bottom: 6rem;
-      /* sits above theme toggle */
+      bottom: 2rem;
       right: 2rem;
       z-index: 9000;
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       gap: 12px;
     }
 
-    /* Chat window — hidden by default, shown via JS */
+    /* Move theme toggle into the fab-row */
+    #theme-toggle {
+      position: static !important;
+      bottom: auto !important;
+      right: auto !important;
+    }
+
+    /* Chat window — draggable, resizable, fixed position */
     #chat-window {
+      position: fixed;
+      bottom: 6rem;
+      right: 2rem;
       width: 360px;
-      max-height: 520px;
+      min-width: 280px;
+      min-height: 360px;
+      max-height: 85vh;
       display: none;
-      /* toggled via JS */
       flex-direction: column;
       border-radius: 20px;
       background: var(--chat-bg);
@@ -1867,32 +1879,39 @@
       box-shadow: 0 24px 80px var(--shadow), 0 0 0 1px var(--border2);
       overflow: hidden;
       transition: background .4s, border-color .4s;
-      /* Slide-in animation */
-      animation: chatSlideUp .25s ease both;
+      z-index: 8999;
+      resize: both;
     }
 
-    @keyframes chatSlideUp {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    #chat-window.chat-opening {
+      animation: chatPopIn .32s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    #chat-window.chat-closing {
+      animation: chatPopOut .22s ease both;
     }
 
-    /* Chat header */
+    @keyframes chatPopIn {
+      from { opacity: 0; transform: scale(.85) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes chatPopOut {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(.85) translateY(10px); }
+    }
+
+    /* Drag handle area = header */
     .chat-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
+      padding: 12px 14px;
       background: var(--chat-header-bg);
       border-bottom: 1px solid var(--border2);
       transition: background .4s, border-color .4s;
+      cursor: grab;
+      user-select: none;
     }
+    .chat-header:active { cursor: grabbing; }
 
     .chat-title {
       display: flex;
@@ -1915,10 +1934,7 @@
       flex-shrink: 0;
     }
 
-    .chat-title-text {
-      display: flex;
-      flex-direction: column;
-    }
+    .chat-title-text { display: flex; flex-direction: column; }
 
     .chat-title-text strong {
       font-size: .86rem;
@@ -1945,6 +1961,8 @@
       display: inline-block;
     }
 
+    .chat-header-actions { display: flex; align-items: center; gap: 4px; }
+
     #chat-close-btn {
       background: none;
       border: none;
@@ -1959,11 +1977,7 @@
       justify-content: center;
       transition: background .2s, color .2s;
     }
-
-    #chat-close-btn:hover {
-      background: var(--border2);
-      color: var(--text);
-    }
+    #chat-close-btn:hover { background: var(--border2); color: var(--text); }
 
     /* Chat body / messages */
     #chat-body {
@@ -1973,35 +1987,21 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      min-height: 200px;
-      max-height: 280px;
+      min-height: 160px;
     }
 
-    #chat-body::-webkit-scrollbar {
-      width: 3px;
-    }
+    #chat-body::-webkit-scrollbar { width: 3px; }
+    #chat-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    #chat-body::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-
-    .chat-msg {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .chat-msg.user {
-      flex-direction: row-reverse;
-    }
+    .chat-msg { display: flex; gap: 8px; align-items: flex-end; }
+    .chat-msg.user { flex-direction: row-reverse; }
 
     .chat-bubble {
       padding: 9px 13px;
       border-radius: 14px;
-      max-width: 78%;
+      max-width: 80%;
       font-size: .82rem;
-      line-height: 1.55;
+      line-height: 1.6;
       font-family: 'DM Sans', sans-serif;
     }
 
@@ -2019,36 +2019,85 @@
       transition: background .4s, color .4s, border-color .4s;
     }
 
+    /* ── Markdown rendering in bot bubbles ── */
+    .chat-msg.bot .chat-bubble strong,
+    .chat-msg.bot .chat-bubble b {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .chat-msg.bot .chat-bubble em,
+    .chat-msg.bot .chat-bubble i {
+      font-style: italic;
+      color: var(--accent2);
+    }
+    .chat-msg.bot .chat-bubble code {
+      font-family: 'Space Mono', monospace;
+      font-size: .76rem;
+      background: var(--surface2);
+      color: var(--accent3);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+    }
+    .chat-msg.bot .chat-bubble pre {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin: 6px 0;
+      overflow-x: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: .73rem;
+      color: var(--accent3);
+    }
+    .chat-msg.bot .chat-bubble pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+    .chat-msg.bot .chat-bubble ol,
+    .chat-msg.bot .chat-bubble ul {
+      padding-left: 1.2rem;
+      margin: 4px 0;
+    }
+    .chat-msg.bot .chat-bubble li {
+      margin-bottom: 4px;
+    }
+    .chat-msg.bot .chat-bubble li strong {
+      display: block;
+      margin-bottom: 1px;
+    }
+    .chat-msg.bot .chat-bubble p { margin: 4px 0; }
+    .chat-msg.bot .chat-bubble h1,
+    .chat-msg.bot .chat-bubble h2,
+    .chat-msg.bot .chat-bubble h3 {
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      margin: 6px 0 3px;
+      font-size: .88rem;
+    }
+    .chat-msg.bot .chat-bubble hr {
+      border: none;
+      border-top: 1px solid var(--border2);
+      margin: 8px 0;
+    }
+
     /* Typing dots */
     .typing-dots span {
       display: inline-block;
-      width: 5px;
-      height: 5px;
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--muted);
       margin: 0 2px;
       animation: typingBounce .8s infinite;
     }
-
-    .typing-dots span:nth-child(2) {
-      animation-delay: .15s;
-    }
-
-    .typing-dots span:nth-child(3) {
-      animation-delay: .30s;
-    }
+    .typing-dots span:nth-child(2) { animation-delay: .15s; }
+    .typing-dots span:nth-child(3) { animation-delay: .30s; }
 
     @keyframes typingBounce {
-
-      0%,
-      80%,
-      100% {
-        transform: translateY(0);
-      }
-
-      40% {
-        transform: translateY(-6px);
-      }
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
     }
 
     /* Suggestion chips */
@@ -2073,7 +2122,6 @@
       transition: background .2s, color .2s, border-color .2s;
       white-space: nowrap;
     }
-
     .chat-suggestions span:hover {
       background: var(--accent);
       color: #fff;
@@ -2102,14 +2150,10 @@
       padding: 6px 0;
       transition: color .4s;
     }
-
-    .chat-input input::placeholder {
-      color: var(--muted);
-    }
+    .chat-input input::placeholder { color: var(--muted); }
 
     .chat-send-btn {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       border-radius: 10px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       border: none;
@@ -2120,16 +2164,11 @@
       flex-shrink: 0;
       transition: opacity .2s, transform .2s;
     }
-
-    .chat-send-btn:hover {
-      opacity: .85;
-      transform: scale(1.05);
-    }
+    .chat-send-btn:hover { opacity: .85; transform: scale(1.05); }
 
     /* Toggle FAB */
     #chat-toggle {
-      width: 56px;
-      height: 56px;
+      width: 52px; height: 52px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       display: flex;
@@ -2142,52 +2181,41 @@
       position: relative;
       flex-shrink: 0;
     }
+    #chat-toggle:hover { transform: scale(1.08); box-shadow: 0 12px 40px var(--glow); }
 
-    #chat-toggle:hover {
-      transform: scale(1.08);
-      box-shadow: 0 12px 40px var(--glow);
+    /* Hide circle (fab) when chat is open */
+    #chat-toggle.open {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.6);
+      transition: opacity .22s, transform .22s;
     }
 
     /* Notification dot */
     #chat-toggle .notif-dot {
       position: absolute;
-      top: 3px;
-      right: 3px;
-      width: 10px;
-      height: 10px;
+      top: 3px; right: 3px;
+      width: 10px; height: 10px;
       background: #ff6b35;
       border-radius: 50%;
       border: 2px solid var(--bg);
+      animation: notifPulse 2s infinite;
+    }
+    @keyframes notifPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,107,53,.4); }
+      50% { box-shadow: 0 0 0 5px rgba(255,107,53,0); }
     }
 
-    /* X icon for close state */
     #chat-toggle .icon-chat,
-    #chat-toggle .icon-x {
-      transition: opacity .2s, transform .2s;
-    }
-
-    #chat-toggle .icon-x {
-      display: none;
-    }
-
-    #chat-toggle.open .icon-chat {
-      display: none;
-    }
-
-    #chat-toggle.open .icon-x {
-      display: flex;
-    }
+    #chat-toggle .icon-x { transition: opacity .2s, transform .2s; }
+    #chat-toggle .icon-x { display: none; }
+    #chat-toggle.open .icon-chat { display: none; }
+    #chat-toggle.open .icon-x { display: flex; }
 
     /* Mobile adjustments */
     @media(max-width:480px) {
-      #chatbot {
-        right: 1rem;
-        bottom: 5rem;
-      }
-
-      #chat-window {
-        width: calc(100vw - 2rem);
-      }
+      #fab-row { right: 1rem; bottom: 1.2rem; }
+      #chat-window { right: 1rem; bottom: 5rem; width: calc(100vw - 2rem); }
     }
   </style>
 </head>
@@ -2197,11 +2225,67 @@
   <div id="cursor"></div>
   <div id="cursor-ring"></div>
 
-  <!-- THEME TOGGLE -->
-  <button id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
-    <span class="icon-dark">🌙</span>
-    <span class="icon-light">☀️</span>
-  </button>
+  <!-- FAB ROW: Theme Toggle + Chat Toggle (horizontal) -->
+  <div id="fab-row">
+    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
+      <span class="icon-dark">🌙</span>
+      <span class="icon-light">☀️</span>
+    </button>
+
+    <!-- Chat Toggle FAB -->
+    <button id="chat-toggle" onclick="openChat()" title="Chat with Vaibhav AI" aria-label="Open chat">
+      <span class="notif-dot"></span>
+      <span class="icon-chat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span class="icon-x" style="display:none;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+      </span>
+    </button>
+  </div>
+
+  <!-- Chat Window (separate from FAB row, draggable/resizable) -->
+  <div id="chat-window">
+    <!-- Header (drag handle) -->
+    <div class="chat-header" id="chat-drag-handle">
+      <div class="chat-title">
+        <div class="bot-avatar">AI</div>
+        <div class="chat-title-text">
+          <strong>Vaibhav AI</strong>
+          <small>Online</small>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button id="chat-close-btn" onclick="closeChat()" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="chat-body"></div>
+
+    <!-- Quick suggestions -->
+    <div class="chat-suggestions">
+      <span onclick="quickAsk(this)">🏭 Projects built</span>
+      <span onclick="quickAsk(this)">🛠 Tech stack</span>
+      <span onclick="quickAsk(this)">💼 Experience</span>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+      <input id="chat-input" placeholder="Ask anything about Vaibhav…" autocomplete="off"
+        onkeydown="if(event.key==='Enter')sendMessage()" />
+      <button class="chat-send-btn" onclick="sendMessage()" title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M22 2L11 13" stroke="white" stroke-width="2.2" stroke-linecap="round" />
+          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2.2" stroke-linejoin="round" fill="none" />
+        </svg>
+      </button>
+    </div>
+  </div>
 
   <!-- NAV -->
   <nav id="navbar">
@@ -2218,70 +2302,6 @@
       <span></span><span></span><span></span>
     </div>
   </nav>
-
-  <!-- ═══════════════════════════════════════
-     CHATBOT — FIXED STRUCTURE
-═══════════════════════════════════════ -->
-  <div id="chatbot">
-
-    <!-- Chat Window (shown above the FAB) -->
-    <div id="chat-window">
-
-      <!-- Header -->
-      <div class="chat-header">
-        <div class="chat-title">
-          <div class="bot-avatar">AI</div>
-          <div class="chat-title-text">
-            <strong>Vaibhav AI</strong>
-            <small>Online</small>
-          </div>
-        </div>
-        <button id="chat-close-btn" onclick="toggleChat()" title="Close">✕</button>
-      </div>
-
-      <!-- Messages -->
-      <div id="chat-body"></div>
-
-      <!-- Quick suggestions -->
-      <div class="chat-suggestions">
-        <span onclick="quickAsk(this)">🏭 Projects built</span>
-        <span onclick="quickAsk(this)">🛠 Tech stack</span>
-        <span onclick="quickAsk(this)">💼 Experience</span>
-      </div>
-
-      <!-- Input -->
-      <div class="chat-input">
-        <input id="chat-input" placeholder="Ask anything about Vaibhav…" autocomplete="off" />
-        <button class="chat-send-btn" onclick="sendMessage()" title="Send">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M22 2L11 13" stroke="white" stroke-width="2.2" stroke-linecap="round" />
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2.2" stroke-linejoin="round"
-              fill="none" />
-          </svg>
-        </button>
-      </div>
-
-    </div>
-
-    <!-- FAB Toggle Button -->
-    <button id="chat-toggle" onclick="toggleChat()" title="Chat with Vaibhav AI" aria-label="Open chat">
-      <span class="notif-dot"></span>
-      <!-- Chat icon -->
-      <span class="icon-chat">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z" stroke="white" stroke-width="1.8"
-            stroke-linejoin="round" />
-        </svg>
-      </span>
-      <!-- X icon (when open) -->
-      <span class="icon-x" style="display:none;align-items:center;justify-content:center;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.2" stroke-linecap="round" />
-        </svg>
-      </span>
-    </button>
-
-  </div>
 
   <!-- ══════════ HERO ══════════ -->
   <section id="hero">
@@ -2621,9 +2641,9 @@
               <div class="contact-item-icon">📱</div>
               <div class="contact-item-text"><label>Phone</label><span>+91 72658-06601</span></div>
             </a>
-            <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank" class="contact-item">
+            <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank" class="contact-item">
               <div class="contact-item-icon">💼</div>
-              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/vaibhav-rathod</span></div>
+              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/in/rathod-vaibhav-b10b17193</span></div>
             </a>
             <a href="https://github.com/rathod-vaibhav" target="_blank" class="contact-item">
               <div class="contact-item-icon">🐱</div>
@@ -2649,16 +2669,16 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-copy">© Copyright
-      <script>document.write(new Date().getFullYear())</script> <span>Vaibhav Rathod</span>. All Rights Reserved
+      <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>document.write(new Date().getFullYear())</script> <span>Vaibhav Rathod</span>. All Rights Reserved
     </div>
     <div class="footer-links">
-      <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank">LinkedIn</a>
+      <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank">LinkedIn</a>
       <a href="https://github.com/rathod-vaibhav" target="_blank">GitHub</a>
       <a href="mailto:vaibhavrathod303@gmail.com">Email</a>
     </div>
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     /* ── Theme ── */
     function toggleTheme() {
       const html = document.documentElement;
@@ -2734,11 +2754,56 @@
     if (hs) statsObs.observe(hs);
 
     /* ── Form ── */
-    function handleSend() {
+    async function handleSend() {
       const btn = document.querySelector('.btn-send');
+      const nameInput = document.querySelector('.contact-form-card input[placeholder="John Doe"]');
+      const emailInput = document.querySelector('.contact-form-card input[type="email"]');
+      const subjectInput = document.querySelector('.contact-form-card input[placeholder="Project Discussion"]');
+      const messageInput = document.querySelector('.contact-form-card textarea');
+
+      const data = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: subjectInput.value.trim(),
+        message: messageInput.value.trim()
+      };
+
+      if (!data.name || !data.email || !data.subject || !data.message) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
       btn.textContent = 'Sending…'; btn.disabled = true;
-      setTimeout(() => { btn.textContent = 'Message Sent ✓'; btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)'; }, 1000);
-      setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; btn.style.background = ''; }, 3500);
+
+      try {
+        const res = await fetch('https://chatbot-model-uyuz.onrender.com/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          btn.textContent = 'Message Sent ✓';
+          btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+          // Clear form
+          nameInput.value = '';
+          emailInput.value = '';
+          subjectInput.value = '';
+          messageInput.value = '';
+        } else {
+          throw new Error('Failed to send');
+        }
+      } catch (err) {
+        btn.textContent = 'Failed to Send ✕';
+        btn.style.background = 'linear-gradient(135deg,#ef4444,#dc2626)';
+        console.error(err);
+      }
+
+      setTimeout(() => {
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 3500);
     }
 
     /* ── Stagger ── */
@@ -2746,32 +2811,97 @@
     document.querySelectorAll('.proj-card').forEach((c, i) => c.style.transitionDelay = (i * .1) + 's');
 
     /* ═══════════════════════════════════════
-       CHATBOT LOGIC — FULLY FIXED
+       CHATBOT LOGIC — ENHANCED v2
     ═══════════════════════════════════════ */
     let chatOpen = false;
 
-    function toggleChat() {
-      chatOpen = !chatOpen;
+    /* ── Simple Markdown → HTML parser ── */
+    function parseMarkdown(text) {
+      // Escape HTML first but preserve structure
+      let html = text
+        // code blocks (``` ... ```)
+        .replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+          `<pre><code>${escHtml(code.trim())}</code></pre>`)
+        // inline code
+        .replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`)
+        // bold **text** or __text__
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.+?)__/g, '<strong>$1</strong>')
+        // italic *text* or _text_
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/_([^_]+)_/g, '<em>$1</em>')
+        // numbered list lines
+        .replace(/^\d+\.\s+\*\*(.+?)\*\*:?(.*)/gm,
+          (_, title, rest) => `<li><strong>${title}</strong>${rest ? ': ' + rest : ''}</li>`)
+        .replace(/^\d+\.\s+(.+)/gm, '<li>$1</li>')
+        // bullet list lines
+        .replace(/^[-*•]\s+\*\*(.+?)\*\*:?(.*)/gm,
+          (_, title, rest) => `<li><strong>${title}</strong>${rest ? ': ' + rest : ''}</li>`)
+        .replace(/^[-*•]\s+(.+)/gm, '<li>$1</li>')
+        // wrap consecutive <li> in <ol> or <ul>
+        .replace(/(<li>.*<\/li>\n?)+/gs, m => `<ul>${m}</ul>`)
+        // headings
+        .replace(/^### (.+)/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)/gm, '<h1>$1</h1>')
+        // horizontal rule
+        .replace(/^---+$/gm, '<hr>')
+        // line breaks → paragraphs
+        .replace(/\n\n+/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+
+      // Wrap in paragraph if not already block
+      if (!html.startsWith('<')) html = '<p>' + html + '</p>';
+      return html;
+    }
+
+    function openChat() {
+      if (chatOpen) return;
+      chatOpen = true;
       const win = document.getElementById('chat-window');
       const toggle = document.getElementById('chat-toggle');
 
-      if (chatOpen) {
-        win.style.display = 'flex';
-        toggle.classList.add('open');
-        // Remove notification dot once opened
-        const dot = toggle.querySelector('.notif-dot');
-        if (dot) dot.style.display = 'none';
-        // Show welcome message on first open
-        const body = document.getElementById('chat-body');
-        if (body.children.length === 0) {
-          appendBotMessage("👋 Hi! I'm Vaibhav's AI assistant. Ask me anything about his skills, projects, or experience!");
-        }
-        // Scroll to bottom
-        setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
-      } else {
-        win.style.display = 'none';
-        toggle.classList.remove('open');
+      // Hide FAB circle
+      toggle.classList.add('open');
+      const dot = toggle.querySelector('.notif-dot');
+      if (dot) dot.style.display = 'none';
+
+      // Show window with pop-in animation
+      win.style.display = 'flex';
+      win.classList.remove('chat-closing');
+      void win.offsetWidth; // reflow
+      win.classList.add('chat-opening');
+
+      // Welcome message on first open
+      const body = document.getElementById('chat-body');
+      if (body.children.length === 0) {
+        setTimeout(() => appendBotMessage("👋 Hi! I'm Vaibhav's AI assistant. Ask me anything about his **skills**, **projects**, or **experience**!"), 200);
       }
+      setTimeout(() => { body.scrollTop = body.scrollHeight; }, 300);
+    }
+
+    function closeChat() {
+      if (!chatOpen) return;
+      chatOpen = false;
+      const win = document.getElementById('chat-window');
+      const toggle = document.getElementById('chat-toggle');
+
+      // Animate out
+      win.classList.remove('chat-opening');
+      win.classList.add('chat-closing');
+
+      // Show FAB circle again
+      toggle.classList.remove('open');
+
+      setTimeout(() => {
+        win.style.display = 'none';
+        win.classList.remove('chat-closing');
+      }, 220);
+    }
+
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     function appendUserMessage(text) {
@@ -2791,15 +2921,8 @@
       bubble.className = 'chat-bubble';
       msg.appendChild(bubble);
       body.appendChild(msg);
+      bubble.innerHTML = parseMarkdown(text);
       body.scrollTop = body.scrollHeight;
-      // Typing effect
-      let i = 0;
-      const iv = setInterval(() => {
-        bubble.textContent += text[i] || '';
-        i++;
-        body.scrollTop = body.scrollHeight;
-        if (i >= text.length) clearInterval(iv);
-      }, 18);
       return bubble;
     }
 
@@ -2812,51 +2935,76 @@
       body.appendChild(msg);
       body.scrollTop = body.scrollHeight;
     }
+
     function removeTypingIndicator() {
       const el = document.getElementById('typing-indicator');
       if (el) el.remove();
     }
 
-    function escHtml(s) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function quickAsk(el) {
+      const text = el.textContent.replace(/^[\s\S]*?(\w)/, '$1').trim();
+      document.getElementById('chat-input').value = text;
+      sendMessage();
     }
 
     async function sendMessage() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
-
       appendUserMessage(text);
       input.value = '';
-
       showTypingIndicator();
-
       try {
-        const res = await fetch('http://127.0.0.1:8000/ask', {
+        const res = await fetch('https://chatbot-model-uyuz.onrender.com/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: text })
         });
         const data = await res.json();
-        console.log("data", data)
         removeTypingIndicator();
-        const reply = Array.isArray(data.answer) ? data.answer.join(' ') : (data.answer || data.answer || 'Got it!');
+        const reply = Array.isArray(data.answer)
+          ? data.answer.join('\n') : (data.answer || 'Got it!');
         appendBotMessage(reply);
       } catch {
         removeTypingIndicator();
-        appendBotMessage("I can't connect to the server right now. Please reach out to Vaibhav directly at vaibhavrathod303@gmail.com 📧");
+        appendBotMessage("⚠️ I can't connect to the server right now. Please try again later.");
       }
     }
 
-    function quickAsk(el) {
-      document.getElementById('chat-input').value = el.textContent.replace(/^[^\w]+/, '').trim();
-      sendMessage();
-    }
+    /* ── Drag to move chat window ── */
+    (function () {
+      const handle = document.getElementById('chat-drag-handle');
+      const win = document.getElementById('chat-window');
+      if (!handle || !win) return;
+      let dragging = false, ox = 0, oy = 0;
 
-    document.getElementById('chat-input').addEventListener('keypress', e => {
-      if (e.key === 'Enter') sendMessage();
-    });
-  </script>
+      handle.addEventListener('mousedown', e => {
+        if (e.button !== 0) return;
+        dragging = true;
+        const rect = win.getBoundingClientRect();
+        ox = e.clientX - rect.left;
+        oy = e.clientY - rect.top;
+        win.style.right = 'auto';
+        win.style.bottom = 'auto';
+        win.style.left = rect.left + 'px';
+        win.style.top = rect.top + 'px';
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        let nx = e.clientX - ox;
+        let ny = e.clientY - oy;
+        nx = Math.max(0, Math.min(nx, window.innerWidth - win.offsetWidth));
+        ny = Math.max(0, Math.min(ny, window.innerHeight - win.offsetHeight));
+        win.style.left = nx + 'px';
+        win.style.top = ny + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        dragging = false;
+        document.body.style.userSelect = '';
+      });
+    })();    </script>
 </body>
-
 </html>
