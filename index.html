@@ -2648,17 +2648,17 @@
           <p>Whether you need a senior Python developer to join your team, build a product from scratch, or optimize an
             existing system — I'd love to hear from you.</p>
           <div class="contact-items">
-            <a href="/cdn-cgi/l/email-protection#780e19111a10190e0a190c10171c4b484b381f15191114561b1715" class="contact-item">
+            <a href="mailto:vaibhavrathod303@gmail.com" class="contact-item">
               <div class="contact-item-icon">✉️</div>
-              <div class="contact-item-text"><label>Email</label><span><span class="__cf_email__" data-cfemail="bbcddad2d9d3dacdc9dacfd3d4df888b88fbdcd6dad2d795d8d4d6">[email&#160;protected]</span></span></div>
+              <div class="contact-item-text"><label>Email</label><span>vaibhavrathod303@gmail.com</span></div>
             </a>
             <a href="tel:+917265806601" class="contact-item">
               <div class="contact-item-icon">📱</div>
               <div class="contact-item-text"><label>Phone</label><span>+91 72658-06601</span></div>
             </a>
-            <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank" class="contact-item">
+            <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank" class="contact-item">
               <div class="contact-item-icon">💼</div>
-              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/vaibhav-rathod</span></div>
+              <div class="contact-item-text"><label>LinkedIn</label><span>linkedin.com/in/rathod-vaibhav-b10b17193/</span></div>
             </a>
             <a href="https://github.com/rathod-vaibhav" target="_blank" class="contact-item">
               <div class="contact-item-icon">🐱</div>
@@ -2687,9 +2687,9 @@
       <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>document.write(new Date().getFullYear())</script> <span>Vaibhav Rathod</span>. All Rights Reserved
     </div>
     <div class="footer-links">
-      <a href="https://linkedin.com/in/vaibhav-rathod" target="_blank">LinkedIn</a>
+      <a href="https://www.linkedin.com/in/rathod-vaibhav-b10b17193/" target="_blank">LinkedIn</a>
       <a href="https://github.com/rathod-vaibhav" target="_blank">GitHub</a>
-      <a href="/cdn-cgi/l/email-protection#a5d3c4ccc7cdc4d3d7c4d1cdcac1969596e5c2c8c4ccc98bc6cac8">Email</a>
+      <a href="mailto:vaibhavrathod303@gmail.com">Email</a>
     </div>
   </footer>
 
@@ -2769,11 +2769,56 @@
     if (hs) statsObs.observe(hs);
 
     /* ── Form ── */
-    function handleSend() {
+    async function handleSend() {
       const btn = document.querySelector('.btn-send');
+      const nameInput = document.querySelector('.contact-form-card input[placeholder="John Doe"]');
+      const emailInput = document.querySelector('.contact-form-card input[type="email"]');
+      const subjectInput = document.querySelector('.contact-form-card input[placeholder="Project Discussion"]');
+      const messageInput = document.querySelector('.contact-form-card textarea');
+
+      const data = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: subjectInput.value.trim(),
+        message: messageInput.value.trim()
+      };
+
+      if (!data.name || !data.email || !data.subject || !data.message) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
       btn.textContent = 'Sending…'; btn.disabled = true;
-      setTimeout(() => { btn.textContent = 'Message Sent ✓'; btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)'; }, 1000);
-      setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; btn.style.background = ''; }, 3500);
+
+      try {
+        const res = await fetch('https://chatbot-model-uyuz.onrender.com/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          btn.textContent = 'Message Sent ✓';
+          btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+          // Clear form
+          nameInput.value = '';
+          emailInput.value = '';
+          subjectInput.value = '';
+          messageInput.value = '';
+        } else {
+          throw new Error('Failed to send');
+        }
+      } catch (err) {
+        btn.textContent = 'Failed to Send ✕';
+        btn.style.background = 'linear-gradient(135deg,#ef4444,#dc2626)';
+        console.error(err);
+      }
+
+      setTimeout(() => {
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 3500);
     }
 
     /* ── Stagger ── */
@@ -2925,7 +2970,7 @@
       input.value = '';
       showTypingIndicator();
       try {
-        const res = await fetch('http://127.0.0.1:8000/ask', {
+        const res = await fetch('https://chatbot-model-uyuz.onrender.com/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: text })
